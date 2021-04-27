@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.1.0/echarts.common.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.1/index.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.bootcss.com/qs/6.5.2/qs.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        input {
+            background: rgba(76, 143, 253, 0.26);
+            height: 30px;
+            border: none;
+            color: #fff;
+            outline: none;
+        }
+
+        ::-webkit-input-placeholder {
+            /* WebKit, Blink, Edge */
+            color: #aaa;
+        }
+
+        :-moz-placeholder {
+            /* Mozilla Firefox 4 to 18 */
+            color: #aaa;
+        }
+
+        ::-moz-placeholder {
+            /* Mozilla Firefox 19+ */
+            color: #aaa;
+        }
+
+        :-ms-input-placeholder {
+            /* Internet Explorer 10-11 */
+            color: #aaa;
+        }
+
+        button {
+            width: 50px;
+            height: 30px;
+            background-color: #1F73FF;
+            border-color: #555;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        html {
+            touch-action: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: Monospace;
+            color: #fff;
+            margin: 0px;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+        .main {
+            width: 100%;
+            height: 100%;
+            background: url('./img/BG.png') no-repeat 0 0/100% 100%;
+            position: relative;
+        }
+
+        .footer {
+            width: 100%;
+            height: 200px;
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .footer>div {
+            width: 300px;
+            height: 100%;
+            background: url('./img/bg-small.png') no-repeat 0 0/100% 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer>div>.title {
+            width: 100%;
+            height: 25px;
+            line-height: 28px;
+            text-indent: 30px;
+            font-size: 18px;
+            font-family: Adobe Heiti Std;
+            font-weight: normal;
+            color: #DEF1FF;
+        }
+
+        .footer>div>.contaner {
+            width: 100%;
+            flex: 1;
+            padding: 30px;
+        }
+
+        .dialog-one {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 450px;
+            height: 300px;
+            background: url('./img/bg-two.png') no-repeat 0 0/100% 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000000;
+        }
+
+        .dialog-one-close {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            top: 0;
+            right: 0;
+            color: #fff;
+            font-size: 30;
+            text-align: center;
+            line-height: 20px;
+        }
+
+        .dialog-one .title {
+            width: 100%;
+            height: 30px;
+            line-height: 35px;
+            text-indent: 30px;
+            font-size: 18px;
+            font-family: Adobe Heiti Std;
+            font-weight: normal;
+            color: #DEF1FF;
+        }
+
+        .dialog-one input {
+            width: 80px;
+            margin-left: 15px;
+            margin-top: 20px;
+        }
+
+        .dialog-one button {
+            margin-left: 15px;
+        }
+
+        .dialog-one #chartOne {
+            width: 100%;
+            flex: 1;
+        }
+
+        .dialog-two {
+            position: fixed;
+            width: 450px;
+            height: 250px;
+            background: url('./img/bg-two.png') no-repeat 0 0/100% 100%;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000000;
+        }
+
+        .dialog-two-close {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            top: 0;
+            right: 0;
+            color: #fff;
+            font-size: 30;
+            text-align: center;
+            line-height: 20px;
+        }
+
+        .dialog-two .title {
+            width: 100%;
+            height: 30px;
+            line-height: 35px;
+            text-indent: 30px;
+            font-size: 18px;
+            font-family: Adobe Heiti Std;
+            font-weight: normal;
+            color: #DEF1FF;
+        }
+
+        .dialog-two #chartTwo {
+            width: 100%;
+            flex: 1;
+        }
+
+        .dialog-three {
+            width: 300px;
+            background: url('./img/bg-three.png') no-repeat 0 0/100% 100%;
+            position: fixed;
+            top: 30px;
+            right: 50px;
+            padding: 0 50px 20px 0;
+            z-index: 1000000;
+        }
+
+
+
+        .dialog-three>.dialog-three-line {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .dialog-three>div span {
+            font-size: 16px;
+            font-family: Adobe Heiti Std;
+            font-weight: normal;
+            color: #DEF1FF;
+        }
+
+        .dialog-three>div input {
+            width: 150px;
+        }
+
+        .dialog-three>.dialog-three-close {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            top: 0;
+            right: 0;
+            color: #fff;
+            font-size: 30;
+            text-align: center;
+            line-height: 20px;
+        }
+    </style>
+    <style>
+        .el-picker-panel {
+            z-index: 10001 !important;
+
+        }
+
+        .el-date-editor {
+            width: 250px !important;
+        }
+
+        .el-input__inner {
+            background-color: rgba(76, 143, 253, 0.26) !important;
+            border: none;
+            color: #fff
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" style="width: 100%;height: 100%;">
+        <div class="main">
+            <div class="footer">
+                <div>
+                    <div class="title">三维煤场分布情况</div>
+                    <div class="contaner">
+                        <div style="margin-bottom: 10px;">
+                            <input type="text" placeholder="请输入热值" v-model="MaterialCalorificVal"><button
+                                @click="MaterialCalorificValSearch">查询</button>
+                        </div>
+                        <div>
+                            <input type="text" placeholder="请输入存放天数" v-model="day"><button
+                                @click="daySearch">查询</button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="title">操作</div>
+                    <div class="contaner">
+                        <div><span>料场：</span><input type="text"></div>
+                        <div style="margin-top:20px;display: flex;justify-content: center;"><button
+                                style="width:120px;">开始盘煤</button></div>
+                        <div style="margin-top:10px;display: flex;justify-content: center;"><button
+                                style="width:120px;border-color: #1F73FF;background-color: transparent;">结束盘煤</button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="title">盘煤数据和三维展示</div>
+                    <div class="contaner">
+                        <div>
+                            开始：<el-date-picker v-model="value1" type="datetime" placeholder="开始时间"
+                                value-format="timestamp">
+                            </el-date-picker>
+                        </div>
+                        <div>
+                            结束：<el-date-picker v-model="value2" type="datetime" placeholder="结束时间"
+                                value-format="timestamp">
+                            </el-date-picker>
+                        </div>
+                        <div style="display: flex;justify-content: center;"><button @click="panmeizhanshi">查询</button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="title">三维热力图展示</div>
+                    <div class="contaner">
+                        <div>
+                            <input type="text" placeholder="请输入时间"><button>查询</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="model" style="width: 1200px;height: 500px;position: fixed;bottom: 220px;right: 150px;">
+        </div>
+        <div class="dialog-one" v-if="closeOneFlag">
+            <div class="title">历史平均温度曲线</div>
+            <div class="search"><input type="text" placeholder="请输入船号" v-model="chuanhao"><input type="text"
+                    placeholder="请输入船次" v-model="chuanci"><input type="text" placeholder="请输入料场"
+                    v-model="liaochang"><button @click="lishiChaxun">查询</button>
+            </div>
+            <div id="chartOne"></div>
+            <!-- <div class="dialog-one-close" @click="closeOne"><i class="el-icon-close"></i></div> -->
+        </div>
+        <div class="dialog-two" v-if="closeTwoFlag">
+            <div class="title">温度历史曲线</div>
+            <div id="chartTwo"></div>
+            <div class="dialog-two-close" @click="closeTwo"><i class="el-icon-close"></i></div>
+        </div>
+        <div class="dialog-three" v-if="closeThreeFlag">
+            <template v-for="(item,i) in listData">
+                <div style="margin-top: 15px;text-indent: 15px;">{{ item.name }}</div>
+                <div class="dialog-three-line"><span>热力值：</span>
+                    <div style="width: 100px;">{{ item.RecordVal }}</div>
+                </div>
+                <div class="dialog-three-line"><span>最高温度：</span>
+                    <div style="width: 100px;">{{ item.StackMaxT }}</div>
+                </div>
+                <div class="dialog-three-line"><span>最低温度：</span>
+                    <div style="width: 100px;">{{ item.StackAvgT }}</div>
+                </div>
+                <div class="dialog-three-line"><span>存放时间：</span>
+                    <div style="width: 100px;">{{ item.Time }}</div>
+                </div>
+            </template>
+            <div class="dialog-three-close" @click="closeThree"><i class="el-icon-close"></i></div>
+        </div>
+        <el-dialog title="盘煤数据和三维展示" :visible.sync="dialogTableVisible" :close-on-click-modal=false width="60%">
+            <el-table :data="tableData">
+                <el-table-column property="YardNo" label="料场名称" header-align="center" align="center"></el-table-column>
+                <el-table-column property="RecordTime" label="盘煤时间" header-align="center" align="center" width="160">
+                </el-table-column>
+                <el-table-column property="YardMaxT" label="料场最高温度" header-align="center" align="center">
+                </el-table-column>
+                <el-table-column property="YardMaxT_Point" label="最高温度点" header-align="center" align="center">
+                </el-table-column>
+                <el-table-column label="任务类型" header-align="center" align="center">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.RunType === -1 ? '不运行' : scope.row.RunType === 0 ? '自动盘煤' : scope.row.RunType === 1 ? '月度盘煤' : scope.row.RunType === 2 ? '其他盘煤' : '自动热成像'}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column property="Remark" label="任务备注" header-align="center" align="center"></el-table-column>
+            </el-table>
+        </el-dialog>
+    </div>
+    <script src="./js/three.min.js"></script>
+    <script src="./js/OBJLoader.js"></script>
+    <script src="./js/OrbitControls.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: function () {
+                return {
+                    myChartOne: null,
+                    myChartTwo: null,
+                    closeOneFlag: true,
+                    closeTwoFlag: false,
+                    closeThreeFlag: false,
+                    value1: '',
+                    value2: '',
+                    tableData: [],
+                    dialogTableVisible: false,
+                    MaterialCalorificVal: '', // 热值
+                    day: '', // 存放天数
+                    camera: null,
+                    scene: null,
+                    renderer: null,
+                    Models: null,
+                    mesh: [],
+                    listData: [],
+                    chuanhao: '',
+                    chuanci: '',
+                    liaochang: '',
+                }
+            },
+            mounted() {
+                this.Models = document.getElementById('model');
+                this.camera = new THREE.PerspectiveCamera(45, 1200 / 500, 1, 3000);
+                this.camera.position.x = 0;
+                this.camera.position.z = 2000;
+                this.camera.position.y = 0;
+                this.scene = new THREE.Scene();
+                let ambientLight = new THREE.AmbientLight(0xcccccc, .5);
+                this.scene.add(ambientLight);
+
+                let pointLight = new THREE.PointLight(0xffffff, .5);
+                this.camera.add(pointLight);
+                this.scene.add(this.camera);
+                this.renderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: true
+                });
+                this.renderer.setClearAlpha(0);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.setSize(1200, 500);
+                this.Models.appendChild(this.renderer.domElement);
+                this.loadObj('Yard1_3d.obj')
+                this.loadObj('Yard2_3d.obj')
+                // this.loadChartOne()
+                // this.loadChartTwo()
+                // window.addEventListener('resize', this.chartResize)
+                this.Models.addEventListener('dblclick', this.onMouseClick, false);
+                window.addEventListener('resize', this.onWindowResize, false);
+            },
+            methods: {
+                loadChartOne(data) {
+                    let {
+                        X,
+                        yard1,
+                        yard2
+                    } = data
+                    let newX = [],
+                        time
+                    if (X) {
+                        X.forEach(item => {
+                            if (item !== time) {
+                                newX.push(item)
+                                time = item
+                            }
+                        })
+                    }
+                    let newYard1 = []
+                    if (yard1) {
+                        newX.forEach(item => {
+                            let flag = true
+                            yard1.forEach(ele => {
+                                if (item === ele.STACK_UpdateTime) {
+                                    flag = false
+                                    newYard1 = [...newYard1, {
+                                        value: ele.StackAvgT,
+                                        YardNo: ele.YardNo,
+                                        StackMaxT: ele.StackMaxT,
+                                        RecordTime: ele.STACK_UpdateTime
+                                    }]
+                                }
+                            })
+                            if (flag) {
+                                newYard1 = [...newYard1, {
+                                    value: '-',
+                                    StackMaxT: '-',
+                                    YardNo: yard1[0].YardNo,
+                                    RecordTime: item
+                                }]
+                            }
+                        })
+                    }
+                    let newYard2 = []
+                    if (yard2) {
+                        newX.forEach(item => {
+                            let flag = true
+                            yard2.forEach(ele => {
+                                if (item === ele.STACK_UpdateTime) {
+                                    flag = false
+                                    newYard2 = [...newYard2, {
+                                        value: ele.StackAvgT,
+                                        YardNo: ele.YardNo,
+                                        StackMaxT: ele.StackMaxT,
+                                        RecordTime: ele.STACK_UpdateTime
+                                    }]
+                                }
+                            })
+                            if (flag) {
+                                newYard2 = [...newYard2, {
+                                    value: '-',
+                                    StackMaxT: '-',
+                                    YardNo: yard2[0].YardNo,
+                                    RecordTime: item
+                                }]
+                            }
+                        })
+                    }
+                    let YData = []
+                    if (newYard1) {
+                        YData.push(newYard1)
+                    }
+                    if (newYard2) {
+                        YData.push(newYard2)
+                    }
+                    let series = []
+                    YData.forEach(item => {
+                        series = [...series, {
+                            name: item[0].YardNo,
+                            data: item,
+                            type: 'line',
+                            smooth: true,
+                            areaStyle: {},
+                            connectNulls: true
+                        }]
+                    })
+                    let chartOne = document.getElementById('chartOne');
+                    this.myChartOne = echarts.init(chartOne);
+                    let options = {
+                        tooltip: {
+                            trigger: "axis",
+                        },
+                        grid: {
+                            left: "3%",
+                            right: "4%",
+                            bottom: "5%",
+                            top: "5%",
+                            containLabel: true,
+                        },
+                        xAxis: {
+                            type: 'category',
+                            boundaryGap: false,
+                            data: newX,
+                            axisLine: {
+                                lineStyle: {
+                                    color: "#ddd",
+                                    fontWeight: 400,
+                                    fontFamily: "Source Han Sans CN",
+                                    fontSize: 10,
+                                },
+                            },
+                        },
+                        yAxis: {
+                            type: 'value',
+                            axisLine: {
+                                lineStyle: {
+                                    color: "#ddd",
+                                    fontWeight: 400,
+                                    fontFamily: "Source Han Sans CN",
+                                    fontSize: 10,
+                                },
+                            },
+                            splitLine: {
+                                lineStyle: {
+                                    color: ["#555"],
+                                    width: 1,
+                                    type: "solid",
+                                },
+                            },
+                        },
+                        series,
+                    }
+                    this.myChartOne.setOption(options);
+                },
+                loadChartTwo(data) {
+                    let {
+                        X,
+                        yard1,
+                        yard2
+                    } = data
+                    let newX = [],
+                        time
+                    if (X) {
+                        X.forEach(item => {
+                            if (item.RecordTime !== time) {
+                                newX.push(item.RecordTime)
+                                time = item.RecordTime
+                            }
+                        })
+                    }
+                    let newYard1 = []
+                    if (yard1) {
+                        newX.forEach(item => {
+                            let flag = true
+                            yard1.forEach(ele => {
+                                if (item === ele.RecordTime) {
+                                    flag = false
+                                    newYard1 = [...newYard1, {
+                                        value: ele.RecordVal,
+                                        YardNo: ele.YardNo,
+                                        RecordTime: ele.RecordTime
+                                    }]
+                                }
+                            })
+                            if (flag) {
+                                newYard1 = [...newYard1, {
+                                    value: '-',
+                                    YardNo: yard1[0].YardNo,
+                                    RecordTime: item
+                                }]
+                            }
+                        })
+                    }
+                    let newYard2 = []
+                    if (yard2) {
+                        newX.forEach(item => {
+                            let flag = true
+                            yard2.forEach(ele => {
+                                if (item === ele.RecordTime) {
+                                    flag = false
+                                    newYard2 = [...newYard2, {
+                                        value: ele.RecordVal,
+                                        YardNo: ele.YardNo,
+                                        RecordTime: ele.RecordTime
+                                    }]
+                                }
+                            })
+                            if (flag) {
+                                newYard2 = [...newYard2, {
+                                    value: '-',
+                                    YardNo: yard2[0].YardNo,
+                                    RecordTime: item
+                                }]
+                            }
+                        })
+                    }
+                    let YData = []
+                    if (newYard1) {
+                        YData.push(newYard1)
+                    }
+                    if (newYard2) {
+                        YData.push(newYard2)
+                    }
+                    let series = []
+                    YData.forEach(item => {
+                        series = [...series, {
+                            name: item[0].YardNo,
+                            data: item,
+                            type: 'line',
+                            smooth: true,
+                            areaStyle: {},
+                            connectNulls: true
+                        }]
+                    })
+                    console.log(series)
+                    let chartTwo = document.getElementById('chartTwo');
+                    this.myChartTwo = echarts.init(chartTwo);
+                    let options = {
+                        tooltip: {
+                            trigger: "axis",
+                        },
+                        grid: {
+                            left: "3%",
+                            right: "4%",
+                            bottom: "5%",
+                            top: "5%",
+                            containLabel: true,
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: newX,
+                            boundaryGap: false,
+                            axisLine: {
+                                lineStyle: {
+                                    color: "#ddd",
+                                    fontWeight: 400,
+                                    fontFamily: "Source Han Sans CN",
+                                    fontSize: 10,
+                                },
+                            },
+                        },
+                        yAxis: {
+                            type: 'value',
+                            axisLine: {
+                                lineStyle: {
+                                    color: "#ddd",
+                                    fontWeight: 400,
+                                    fontFamily: "Source Han Sans CN",
+                                    fontSize: 10,
+                                },
+                            },
+                            splitLine: {
+                                lineStyle: {
+                                    color: ["#555"],
+                                    width: 1,
+                                    type: "solid",
+                                },
+                            },
+                        },
+                        series
+                    }
+                    this.myChartTwo.setOption(options);
+                },
+                chartResize() {
+                    this.myChartOne.resize()
+                    this.myChartTwo.resize()
+                },
+                closeOne() {
+                    this.closeOneFlag = false
+                },
+                closeTwo() {
+                    this.closeTwoFlag = false
+                },
+                closeThree() {
+                    this.closeThreeFlag = false
+                },
+                // 历史温度查询
+                lishiChaxun() {
+                    axios({
+                        method: 'post',
+                        url: 'http://panmei.wyy.zone/admin/auth/search/info',
+                        data: {
+                            MaterialShipNumber: this.chuanhao,
+                            MaterialShipName: this.chuanci,
+                            MaterialName: this.liaochang,
+                        }
+                    }).then(data => {
+                        if (data.data.code === 200) {
+                            this.loadChartOne(data.data.data)
+                        }
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                },
+                // 热值
+                MaterialCalorificValSearch() {
+                    if (this.MaterialCalorificVal === '') {
+                        // this.scene.remove(this.mesh[0])
+                        // this.loadObj('Yard1.obj')
+                        return
+                    }
+                    axios({
+                        method: 'post',
+                        url: 'http://panmei.wyy.zone/admin/auth/search/calorific',
+                        data: {
+                            MaterialCalorificVal: this.MaterialCalorificVal,
+                        }
+                    }).then(data => {
+                        if (data.data.code === 200) {
+                            let param = data.data.data
+                            param.length && param.forEach(item => {
+                                if (item.name === "Yard1") {
+                                    this.loadObj('Yard1_3d.obj', item.data)
+                                }
+                                if (item.name === "Yard2") {
+                                    this.loadObj('Yard2_3d.obj', item.data)
+                                }
+                            });
+                        }
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                },
+                // 存放天数
+                daySearch() {
+                    if (this.day === '') {
+                        // this.scene.remove(this.mesh[0])
+                        // this.loadObj('Yard1.obj')
+                        return
+                    }
+                    axios({
+                        method: 'post',
+                        url: 'http://panmei.wyy.zone/admin/auth/search/day',
+                        data: {
+                            day: this.day,
+                        }
+                    }).then(data => {
+                        if (data.data.code === 200) {
+                            let param = data.data.data
+                            param.length && param.forEach(item => {
+                                if (item.name === "Yard1") {
+                                    this.loadObj('Yard1_3d.obj', item.data)
+                                }
+                                if (item.name === "Yard2") {
+                                    this.loadObj('Yard2_3d.obj', item.data)
+                                }
+                            });
+                        }
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                },
+                // 双击展示温度历史曲线
+                dblT(x, y, clientX, clientY) {
+                    this.wendu = ''
+                    this.rezhi = ''
+                    this.shijian = ''
+                    this.closeTwoFlag = true
+                    this.closeThreeFlag = true
+                    this.$nextTick(() => {
+                        let dialogTwo = document.getElementsByClassName('dialog-two')[0]
+                        let dialogThree = document.getElementsByClassName('dialog-three')[0]
+                        dialogTwo.style.top = clientY + 'px'
+                        dialogTwo.style.left = (clientX - 460) + 'px'
+                        dialogThree.style.top = (clientY + 10) + 'px'
+                        dialogThree.style.left = (clientX + 10) + 'px'
+                    })
+
+                    let xx = parseInt((x + 1000) / 0.007 / 1000)
+                    let yy = parseInt(y / 0.007 / 1000)
+                    if (xx % 2) {
+                        xx = xx - 1
+                    }
+                    if (yy % 2) {
+                        yy = yy - 1
+                    }
+                    axios({
+                        method: 'post',
+                        url: 'http://panmei.wyy.zone/admin/auth/search/yard',
+                        data: {
+                            X: xx,
+                            Y: yy
+                        }
+                    }).then(data => {
+                        if (data.data.code === 200) {
+                            this.listData = data.data.data
+                        }
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                    axios({
+                        method: 'post',
+                        url: 'http://panmei.wyy.zone/admin/auth/search/curve',
+                        data: {
+                            X: xx,
+                            Y: yy
+                        }
+                    }).then(data => {
+                        if (data.data.code === 200) {
+                            this.loadChartTwo(data.data.data)
+                        }
+                    }).catch(err => {
+                        console.log(err)
+                    })
+                },
+                panmeizhanshi() {
+                    if (this.value1 && this.value2) {
+                        axios({
+                            method: 'post',
+                            url: 'http://panmei.wyy.zone/admin/auth/search/history',
+                            data: {
+                                start_time: this.value1,
+                                end_time: this.value2
+                            }
+                        }).then(data => {
+                            if (data.data.code === 200) {
+                                this.tableData = data.data.data
+                                this.dialogTableVisible = true
+                            }
+                        }).catch(err => {
+                            console.log(err)
+                        })
+                    } else {
+                        this.$message.error('请输入正确时间');
+                    }
+                },
+                onWindowResize() {
+
+                    this.camera.aspect = 1200 / 500;
+                    this.camera.updateProjectionMatrix();
+
+                    this.renderer.setSize(1200, 500);
+
+                },
+                onMouseClick(event) {
+                    let raycaster = new THREE.Raycaster();
+                    let mouse = new THREE.Vector2();
+
+                    //通过鼠标点击的位置计算出raycaster所需要的点的位置，以屏幕中心为原点，值的范围为-1到1.
+                    // console.log(event.clientX,event.clientY)
+                    mouse.x = (event.offsetX / this.renderer.domElement.clientWidth) * 2 - 1;
+                    mouse.y = -(event.offsetY / this.renderer.domElement.clientHeight) * 2 + 1;
+                    // 通过鼠标点的位置和当前相机的矩阵计算出raycaster
+                    raycaster.setFromCamera(mouse, this.camera);
+                    let meshObjOne = this.scene.children[this.scene.children.length - 2].children
+                    let meshObjTwo = this.scene.children[this.scene.children.length - 1].children
+                    let point
+                    // 获取raycaster直线和所有模型相交的数组集合
+                    let intersectsOne = raycaster.intersectObjects(meshObjOne);
+                    if (intersectsOne.length > 0) {
+                        // console.log(intersects[0].point); // 根据这里面的信息可确定点击的模型范围增加交互效果
+                        point = intersectsOne[0].point
+                        // let deg // 与y轴正半轴夹角
+                        // if (point.x < 0) {
+                        //     deg = 360 + 180 * Math.atan2(point.x, point.y) / Math.PI
+                        // } else {
+                        //     deg = 180 * Math.atan2(point.x, point.y) / Math.PI
+                        // }
+                        // console.log(deg)
+                        // console.log(point)
+                        // this.dblT(point.x, point.y)
+                    }
+                    let intersectsTwo = raycaster.intersectObjects(meshObjTwo);
+                    if (intersectsTwo.length > 0) {
+                        point = intersectsTwo[0].point
+
+                    }
+                    // console.log(point)
+                    this.dblT(point.x, point.y, event.clientX, event.clientY)
+                },
+                init(url, search) {
+                    let object
+                    //利用一个轴对象以可视化的3轴以简单的方式。X轴是红色的。Y轴是绿色的。Z轴是蓝色的。这有助于理解在空间的所有三个轴的方向。
+                    // var axisHelper = new THREE.AxisHelper(800);
+                    // scene.add(axisHelper);
+                    // var controls = new THREE.OrbitControls(this.camera); //轨道控制，平移旋转的控制都由这个决定，百度下这个实例下的各种方法就好
+                    // controls.autoRotate = false; // 设置平面自动旋转
+                    // //上下翻转的最大角度
+                    // // controls.maxPolarAngle = 2.5;
+                    // // //上下翻转的最小角度
+                    // // controls.minPolarAngle = 0.3;
+                    // //左右翻转的最大角度
+                    // // controls.maxAzimuthAngle = 0.9;
+                    // //左右翻转的最小角度
+                    // // controls.minAzimuthAngle = -0.5;
+                    // controls.enablePan = false
+                    // controls.enableZoom = false
+
+                    // manager
+                    let scene = this.scene
+                    let mesh = this.mesh
+                    // let axisHelper = new THREE.AxisHelper(800);
+                    // scene.add(axisHelper);
+
+                    function loadModel() {
+                        object.scale.setScalar(0.007);
+                        object.position.x = -1000;
+                        // object.rotation.z = 1.57;
+                        mesh.push(object)
+                        scene.add(object);
+                    }
+
+                    let manager = new THREE.LoadingManager(loadModel);
+
+                    manager.onProgress = function (item, loaded, total) {
+
+                        console.log(item, loaded, total);
+
+                    };
+
+                    function onProgress(xhr) {
+                        if (xhr.lengthComputable) {
+                            var percentComplete = xhr.loaded / xhr.total * 100;
+                            console.log('model ' + Math.round(percentComplete, 2) + '% downloaded');
+
+                        }
+
+                    }
+
+                    function onError(xhr) {}
+
+                    let loader = new THREE.OBJLoader(manager);
+
+                    //          loader.load( 'models/obj/male02/male02.obj', function ( obj ) {
+                    loader.load(url, function (obj) { // 加载3d模型，修改文件名就好
+                        object = obj;
+
+                    }, onProgress, onError, search);
+
+                },
+                animate() {
+                    requestAnimationFrame(this.animate);
+                    //  camera.position.x += ( mouseX - camera.position.x ) * .05;
+                    //  camera.position.y += ( - mouseY - camera.position.y ) * .05;
+                    // camera.position.x += .05;
+                    // camera.position.y += .05;
+                    this.camera.lookAt(this.scene.position);
+                    this.renderer.render(this.scene, this.camera);
+                },
+                loadObj(url, search) {
+                    this.init(url, search);
+                    this.animate();
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
